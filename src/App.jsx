@@ -112,6 +112,7 @@ export default function App() {
       <AlertsFeed 
         alerts={alerts} 
         onSimulateAlert={handleSimulateAlert} 
+        onRefresh={handleRefresh}
       />
 
       {/* Section E: Footer Card */}

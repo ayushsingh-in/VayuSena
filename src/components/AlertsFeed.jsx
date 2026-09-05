@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Bell, Zap, CheckCircle, Clock, Send, ShieldAlert } from 'lucide-react';
 import { getSeverityBand } from '../services/api';
+import CustomAlertModal from './CustomAlertModal';
 
-export default function AlertsFeed({ alerts, onSimulateAlert }) {
+export default function AlertsFeed({ alerts, onSimulateAlert, onRefresh }) {
+  const [isCustomModalOpen, setCustomModalOpen] = useState(false);
   const getBadgeClass = (severity) => {
     const s = (severity || '').toLowerCase().replace(/[^a-z]/g, '');
     if (s.includes('severe')) return 'badge-severe';
@@ -54,7 +56,16 @@ export default function AlertsFeed({ alerts, onSimulateAlert }) {
           <span className="count-pill">{alerts.length} Records</span>
         </div>
 
-        <div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button 
+            className="btn-simulate"
+            style={{ backgroundColor: '#0ea5e9' }}
+            onClick={() => setCustomModalOpen(true)}
+            title="Broadcast a custom alert to a specific area"
+          >
+            <Send size={13} fill="#ffffff" />
+            <span>Broadcast Alert</span>
+          </button>
           <button 
             className="btn-simulate"
             onClick={onSimulateAlert}
@@ -65,6 +76,12 @@ export default function AlertsFeed({ alerts, onSimulateAlert }) {
           </button>
         </div>
       </div>
+
+      <CustomAlertModal 
+        isOpen={isCustomModalOpen} 
+        onClose={() => setCustomModalOpen(false)} 
+        onSuccess={onRefresh}
+      />
 
       <div className="table-responsive">
         <table className="alerts-table">

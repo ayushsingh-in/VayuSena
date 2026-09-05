@@ -239,3 +239,21 @@ export async function fetchAlerts() {
     return { alerts: initialMockAlerts };
   }
 }
+
+export async function broadcastCustomAlert(payload) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/alerts/custom`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) throw new Error('Network error');
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to broadcast alert:", err);
+    throw err;
+  }
+}

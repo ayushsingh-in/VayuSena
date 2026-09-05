@@ -1,4 +1,5 @@
 import os
+import time
 import asyncio
 from datetime import datetime
 # pyrefly: ignore [missing-import]
@@ -11,6 +12,7 @@ import httpx
 from dotenv import load_dotenv
 import csv
 import joblib
+from pydantic import BaseModel
 import pandas as pd
 import numpy as np
 
@@ -280,6 +282,34 @@ async def get_forecast():
             "features": ["lag_aqi", "wind_speed", "fire_count", "month"]
         }
     }
+
+class CustomAlertRequest(BaseModel):
+    district: str
+    severity: str
+    message: str
+
+@app.post("/api/alerts/custom")
+async def broadcast_custom_alert(alert_req: CustomAlertRequest):
+    current_time_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+    alert_id = f"ALT-CUSTOM-{int(time.time())}"
+    
+    async with AsyncSessionLocal() as session:
+        # Simulate SMS
+        print(f"\n[SMS SENT] 📲 To: Authorities | Alert: {alert_req.severity} | Region: {alert_req.district} | Action: {alert_req.message}\n")
+        
+        new_alert = Alert(
+            id=alert_id,
+            date=current_time_str,
+            district=alert_req.district,
+            predictedAqi=0, # N/A for custom manual alert
+            severity=alert_req.severity,
+            status="Active",
+            recommendation=alert_req.message
+        )
+        session.add(new_alert)
+        await session.commit()
+        
+    return {"success": True, "alert_id": alert_id}
 
 @app.get("/api/alerts")
 async def get_alerts():
