@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+httpx
+python-dotenv
+pydantic
+SQLAlchemy
+aiosqlite
+greenlet
+scikit-learn
+pandas
+numpy
+joblib

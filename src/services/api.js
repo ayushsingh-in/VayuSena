@@ -202,7 +202,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export async function fetchStats() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/stats`, { signal: AbortSignal.timeout(1200) });
+    const res = await fetch(`${API_BASE_URL}/api/stats`, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) throw new Error('Network error');
     return await res.json();
   } catch (err) {
@@ -212,7 +212,7 @@ export async function fetchStats() {
 
 export async function fetchHotspots() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/hotspots`, { signal: AbortSignal.timeout(1200) });
+    const res = await fetch(`${API_BASE_URL}/api/hotspots`, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) throw new Error('Network error');
     return await res.json();
   } catch (err) {
@@ -222,7 +222,7 @@ export async function fetchHotspots() {
 
 export async function fetchForecast() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/forecast`, { signal: AbortSignal.timeout(1200) });
+    const res = await fetch(`${API_BASE_URL}/api/forecast`, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) throw new Error('Network error');
     return await res.json();
   } catch (err) {
@@ -232,7 +232,7 @@ export async function fetchForecast() {
 
 export async function fetchAlerts() {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/alerts`, { signal: AbortSignal.timeout(1200) });
+    const res = await fetch(`${API_BASE_URL}/api/alerts`, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) throw new Error('Network error');
     return await res.json();
   } catch (err) {
