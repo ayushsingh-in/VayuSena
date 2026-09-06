@@ -257,3 +257,33 @@ export async function broadcastCustomAlert(payload) {
     throw err;
   }
 }
+
+export async function loginAdmin(email, password) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || 'Login failed');
+  }
+  return await res.json();
+}
+
+export async function forgotPassword(email) {
+  const res = await fetch(`${API_BASE_URL}/api/admin/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || 'Email verification failed');
+  }
+  return await res.json();
+}

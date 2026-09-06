@@ -2,11 +2,9 @@ import os
 import time
 import asyncio
 from datetime import datetime
-# pyrefly: ignore [missing-import]
 from fastapi import FastAPI
-# pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
-# pyrefly: ignore [missing-import]
+
 import httpx
 # pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
@@ -17,7 +15,7 @@ import pandas as pd
 import numpy as np
 
 from io import StringIO
-from database import engine, Base, AsyncSessionLocal, Hotspot, DailyAQI, Alert
+from database import engine, Base, AsyncSessionLocal, Hotspot, DailyAQI, Alert, Admin
 from sqlalchemy.future import select
 
 load_dotenv()
@@ -45,6 +43,14 @@ app.add_middleware(
 async def on_startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        
+    async with AsyncSessionLocal() as session:
+        stmt = select(Admin).where(Admin.email == "admin@vayusena.in")
+        result = await session.execute(stmt)
+        admin = result.scalars().first()
+        if not admin:
+            session.add(Admin(email="admin@vayusena.in", password="admin123"))
+            await session.commit()
 
 NASA_FIRMS_API_KEY = os.getenv("NASA_FIRMS_API_KEY")
 WAQI_API_KEY = os.getenv("WAQI_API_KEY")
@@ -66,6 +72,35 @@ def get_wind_direction_label(degree: int) -> str:
     dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
     ix = int((degree + 22.5) / 45.0)
     return dirs[ix % 8]
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+from fastapi import HTTPException
+
+@app.post("/api/admin/login")
+async def admin_login(req: LoginRequest):
+    async with AsyncSessionLocal() as session:
+        stmt = select(Admin).where(Admin.email == req.email, Admin.password == req.password)
+        result = await session.execute(stmt)
+        admin = result.scalars().first()
+        if not admin:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        return {"message": "Login successful"}
+
+@app.post("/api/admin/forgot-password")
+async def admin_forgot_password(req: ForgotPasswordRequest):
+    async with AsyncSessionLocal() as session:
+        stmt = select(Admin).where(Admin.email == req.email)
+        result = await session.execute(stmt)
+        admin = result.scalars().first()
+        if not admin:
+            raise HTTPException(status_code=404, detail="Email not found")
+        return {"message": "Password reset link sent"}
 
 @app.get("/api/stats")
 async def get_stats():
@@ -287,10 +322,14 @@ class CustomAlertRequest(BaseModel):
     district: str
     severity: str
     message: str
+    predicted_aqi: int = 0
 
 @app.post("/api/alerts/custom")
 async def broadcast_custom_alert(alert_req: CustomAlertRequest):
-    current_time_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+    from datetime import timedelta
+    # Use explicitly Indian Standard Time (IST)
+    ist_time = datetime.utcnow() + timedelta(hours=5, minutes=30)
+    current_time_str = ist_time.strftime("%Y-%m-%d %H:%M")
     alert_id = f"ALT-CUSTOM-{int(time.time())}"
     
     async with AsyncSessionLocal() as session:
@@ -301,7 +340,7 @@ async def broadcast_custom_alert(alert_req: CustomAlertRequest):
             id=alert_id,
             date=current_time_str,
             district=alert_req.district,
-            predictedAqi=0, # N/A for custom manual alert
+            predictedAqi=alert_req.predicted_aqi,
             severity=alert_req.severity,
             status="Active",
             recommendation=alert_req.message

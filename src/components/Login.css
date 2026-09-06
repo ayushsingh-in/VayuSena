@@ -1,0 +1,258 @@
+/* Base Container */
+.login-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Card Wrapper to handle overlapping logo */
+.login-card-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 535px;
+}
+
+/* Overlapping Logo */
+.login-logo {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  object-fit: contain;
+  position: absolute;
+  top: -110px;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  /* Optional: white background if the generated logo needs isolation */
+  background: white;
+}
+
+/* Glassmorphism Card */
+.login-card {
+  width: 100%;
+  background: rgba(220, 225, 235, 0.85); /* Slightly translucent greyish-white like IMAGE 1 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 130px 48px 48px 48px; /* High top padding to account for the logo */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Heading */
+.login-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 24px 0;
+  font-family: monospace; /* The reference image seems to have a slightly monospaced or typewriter font for the heading, but standard sans-serif is also fine. Let's stick to monospace for the exact vibe of the image or standard. The image has a distinct tech font. We'll use a clean sans-serif/monospace hybrid vibe */
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Inputs */
+.input-group {
+  width: 100%;
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  height: 64px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 0 20px;
+  font-size: 16px;
+  color: #1f2937;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.input-group input::placeholder {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.input-group input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Password Eye Icon */
+.eye-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.eye-toggle:hover {
+  color: #4b5563;
+}
+
+/* Forgot Password */
+.forgot-password-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.forgot-btn {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.forgot-btn:hover {
+  color: #4338ca;
+}
+
+/* Login Button */
+.login-btn {
+  width: 100%;
+  height: 64px;
+  background: #2b3a5a; /* Dark navy */
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Security Status */
+.login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 32px;
+  gap: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 600;
+}
+
+.status-label {
+  color: #111827;
+  font-size: 15px;
+}
+
+.status-secure {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #4f46e5; /* Match the blue of the lock in reference */
+}
+
+.shield-icon {
+  fill: #4f46e5;
+  color: #4f46e5;
+}
+
+/* Messages */
+.error-message {
+  color: #dc2626;
+  font-size: 14px;
+  text-align: center;
+  background: #fee2e2;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.success-message {
+  color: #059669;
+  font-size: 14px;
+  text-align: center;
+  background: #d1fae5;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Scaling */
+@media (max-width: 768px) {
+  .login-card-wrapper {
+    width: 92%;
+  }
+  
+  .login-logo {
+    width: 180px;
+    height: 180px;
+    top: -90px;
+  }
+  
+  .login-card {
+    padding: 110px 32px 32px 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-logo {
+    width: 150px;
+    height: 150px;
+    top: -75px;
+  }
+  
+  .login-card {
+    padding: 95px 24px 24px 24px;
+  }
+  
+  .input-group input, .login-btn {
+    height: 56px;
+  }
+}

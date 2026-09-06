@@ -6,6 +6,7 @@ import ForecastChart from './components/ForecastChart';
 import AlertsFeed from './components/AlertsFeed';
 import FooterCard from './components/FooterCard';
 import ApiDocsModal from './components/ApiDocsModal';
+import Login from './components/Login';
 import { 
   initialMockStats, 
   initialMockHotspots, 
@@ -20,6 +21,7 @@ import {
 import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [stats, setStats] = useState(initialMockStats);
   const [hotspotData, setHotspotData] = useState(initialMockHotspots);
   const [forecastData, setForecastData] = useState(initialMockForecast);
@@ -32,16 +34,18 @@ export default function App() {
 
   // Initialize clock and data
   useEffect(() => {
+    if (!isAuthenticated) return;
+    
     const updateTime = () => {
       const now = new Date();
       setLastUpdated(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     };
     updateTime();
 
-    // Auto-refresh interval every 30 seconds for live feel
-    const timer = setInterval(updateTime, 30000);
+    // Auto-refresh interval every 1 second for live feel
+    const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isAuthenticated]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -74,21 +78,40 @@ export default function App() {
     }, 3200);
   };
 
-  const handleSimulateAlert = () => {
-    const newAlert = generateSimulatedAlert();
-    setAlerts(prev => [newAlert, ...prev]);
+  const handleSimulateAlert = async () => {
+    const fakeAlert = generateSimulatedAlert();
+    
+    // Call the backend to actually store it in the database
+    try {
+      await import('./services/api').then(m => m.broadcastCustomAlert({
+        district: fakeAlert.district,
+        severity: fakeAlert.severity,
+        message: fakeAlert.recommendation,
+        predicted_aqi: fakeAlert.predictedAqi
+      }));
+      
+      // Re-fetch all alerts from the backend to get the newly inserted one with IST time
+      handleRefresh();
+      
+      // Also update stats slightly to demonstrate live reactive linkage
+      setStats(prev => ({
+        ...prev,
+        activeHotspots: prev.activeHotspots + 3,
+        punjabHotspots: prev.punjabHotspots + 2,
+        haryanaHotspots: prev.haryanaHotspots + 1,
+        currentAqi: Math.min(450, prev.currentAqi + 2)
+      }));
 
-    // Also update stats slightly to demonstrate live reactive linkage
-    setStats(prev => ({
-      ...prev,
-      activeHotspots: prev.activeHotspots + 3,
-      punjabHotspots: prev.punjabHotspots + 2,
-      haryanaHotspots: prev.haryanaHotspots + 1,
-      currentAqi: Math.min(450, prev.currentAqi + 2)
-    }));
-
-    showToast(`⚡ Live Trigger: New alert dispatched to ${newAlert.district}`);
+      showToast(`⚡ Live Trigger: New alert dispatched and saved to database!`);
+    } catch (err) {
+      console.error("Failed to broadcast alert", err);
+      showToast("❌ Failed to broadcast alert");
+    }
   };
+
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div className="app-container">

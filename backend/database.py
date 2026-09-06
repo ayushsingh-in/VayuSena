@@ -41,3 +41,9 @@ class Alert(Base):
     severity = Column(String)
     status = Column(String)
     recommendation = Column(String)
+
+class Admin(Base):
+    __tablename__ = "admins"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String, unique=True, index=True)
+    password = Column(String)
